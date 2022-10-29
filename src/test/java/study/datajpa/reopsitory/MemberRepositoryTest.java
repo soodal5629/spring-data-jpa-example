@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
+import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 
 import java.util.Arrays;
@@ -88,7 +90,7 @@ class MemberRepositoryTest {
             System.out.println("member = " + member);
         }
     }
-
+/*
     @Test
     public void paging() {
         // given
@@ -104,6 +106,9 @@ class MemberRepositoryTest {
         // when
         Page<Member> page = memberRepository.findByAge(age, pageRequest);
 
+        // map은 내부의 것을 바꿔서 다른 결과를 냄 --> DTO로 변환했기 떄문에 API 응답으로 반환 가능
+        Page<MemberDto> toMap = page.map(m -> new MemberDto(m.getId(), m.getUsername(), null));
+
         // then
         List<Member> content = page.getContent();
         long totalElements = page.getTotalElements(); // totalCount와 같은 것
@@ -112,6 +117,33 @@ class MemberRepositoryTest {
         assertThat(totalElements).isEqualTo(5);
         assertThat(page.getNumber()).isEqualTo(0);
         assertThat(page.getTotalPages()).isEqualTo(2);
+        assertThat(page.isFirst()).isTrue();
+        assertThat(page.hasNext()).isTrue();
+
+    }
+*/
+    @Test
+    public void pagingSlice() {
+        // given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 10));
+        memberRepository.save(new Member("member3", 10));
+        memberRepository.save(new Member("member4", 10));
+        memberRepository.save(new Member("member5", 10));
+
+        int age = 10;
+        // 0페이지에서 3개 가져와
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+        // when
+        // Slice는 전체 total count를 가져오지 않는다.
+        // 실제로 3개를 요청했지만 쿼리에는 4개가 날아감 (1개 더 있는지 확인)
+        Slice<Member> page = memberRepository.findByAge(age, pageRequest);
+
+        // then
+        List<Member> content = page.getContent();
+
+        assertThat(content.size()).isEqualTo(3);
+        assertThat(page.getNumber()).isEqualTo(0);
         assertThat(page.isFirst()).isTrue();
         assertThat(page.hasNext()).isTrue();
 
