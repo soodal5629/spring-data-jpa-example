@@ -1,5 +1,7 @@
 package study.datajpa.reopsitory;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -8,6 +10,7 @@ import study.datajpa.entity.Member;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
@@ -28,4 +31,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     /* List 말고도 여러가지 컬렉션 타입을 받을 수 있음 && 컬렉션 파라미터를 통해 in 절로 여러개 조회 가능 */
     @Query("select m from Member m where m.username in :names")
     List<Member> findByNames(@Param("names") Collection<String> names);
+
+    /* 단건 Optional */
+    Optional<Member> findOptionalByUsername(String username);
+
+    /* 페이징 처리 */
+    Page<Member> findByAge(int age, Pageable pageable);
 }
