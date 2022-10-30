@@ -46,10 +46,17 @@ public class MemberJpaRepository {
                 .setMaxResults(limit) // 개수를 몇개를 가져올거야
                 .getResultList();
     }
-
     public long totalCount(int age) {
         return em.createQuery("select count(m) from Member m where m.age = :age", Long.class)
                 .setParameter("age", age)
                 .getSingleResult();
+    }
+
+    /* 벌크성 수정 쿼리 */
+    public int bulkAgePlus(int age){
+        return em.createQuery("update Member m set m.age = m.age + 1"
+                                                + "where m.age>= :age")
+                .setParameter("age", age)
+                .executeUpdate(); // 수정된 개수 반환
     }
 }

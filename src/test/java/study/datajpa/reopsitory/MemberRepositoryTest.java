@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,6 +23,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class MemberRepositoryTest {
     @Autowired MemberRepository memberRepository;
+    @PersistenceContext EntityManager em; // 같은 트랜잭션 내에서는 같은 엔티티 매니저 사용함
+
 
     @Test
     public void testSave(){
@@ -146,6 +150,24 @@ class MemberRepositoryTest {
         assertThat(page.getNumber()).isEqualTo(0);
         assertThat(page.isFirst()).isTrue();
         assertThat(page.hasNext()).isTrue();
+    }
 
+    @Test
+    public void bulkUpdate() {
+        // given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 19));
+        memberRepository.save(new Member("member3", 20));
+        memberRepository.save(new Member("member4", 21));
+        memberRepository.save(new Member("member5", 40));
+
+        // when
+        int resultCount = memberRepository.bulkAgePlus(20);
+        em.flush(); // 변경되지 않은 내용이 DB에 반영됨
+        em.clear(); // 영속성 컨텍스트이 1차캐시 다 날려줌 --> 벌크성 연산과 영속성 컨텍스트의 데이터 정합성을 맞춰줨
+        // ▶ 따라서 clear 후에 조회할 땐 영속성 컨텍스트가 아닌 DB에서 다시 조회함
+        // ★★★★★ 벌크성 연산 후에는 가급적 영속성 컨텍스트를 꼭 날려줘야 함
+        // then
+        assertThat(resultCount).isEqualTo(3);
     }
 }
