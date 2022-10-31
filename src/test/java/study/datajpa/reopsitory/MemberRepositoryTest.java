@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
+import study.datajpa.entity.Team;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -23,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class MemberRepositoryTest {
     @Autowired MemberRepository memberRepository;
+    @Autowired TeamRepository teamRepository;
     @PersistenceContext EntityManager em; // 같은 트랜잭션 내에서는 같은 엔티티 매니저 사용함
 
 
@@ -169,5 +171,29 @@ class MemberRepositoryTest {
         // ★★★★★ 벌크성 연산 후에는 가급적 영속성 컨텍스트를 꼭 날려줘야 함
         // then
         assertThat(resultCount).isEqualTo(3);
+    }
+
+    @Test
+    public void findMemberLazy() {
+        // given
+        // member1 --> teamA
+        // member2 --> teamB
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+        Member member1 = new Member("member1", 10, teamA);
+        Member member2 = new Member("member2", 10, teamB);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        em.flush();
+        em.clear();
+
+        //when
+        List<Member> members = memberRepository.findAll();
+        for (Member member : members) {
+            System.out.println("member = " + member.getUsername());
+            System.out.println("member.team = " + member.getTeam().getName());
+        }
     }
 }
