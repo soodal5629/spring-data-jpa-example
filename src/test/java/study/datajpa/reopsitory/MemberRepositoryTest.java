@@ -196,4 +196,9 @@ class MemberRepositoryTest {
             System.out.println("member.team = " + member.getTeam().getName());
         }
     }
+    
+    @Test
+    public void callCustom(){
+        List<Member> result = memberRepository.findMemberCustom();
+    }
 }
