@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // 밑에 주석해놓은 것과 같음
 @ToString(of = {"id", "username", "age"}) // team 넣으면 무한루프 돌 수 있음
-public class Member {
+public class Member extends JpaBaseEntity {
 
     @Id @GeneratedValue
     @Column(name = "member_id")
