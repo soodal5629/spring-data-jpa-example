@@ -11,6 +11,11 @@ spring:
       hibernate:
         # show_sql: true
         format_sql: true # 쿼리가 한줄로 나오지 않고 포맷팅 되서 이쁘게 나옴
+  data:
+    web:
+      pageable:
+        default-page-size: 10 # 디폴트 페이징 사이즈가 10개로 설정됨(글로벌 설정)
+        max-page-size: 2000 # 최대 페이지 사이즈
 
 logging.level:
   org.hibernate.SQL: debug
