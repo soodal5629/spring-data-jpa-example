@@ -17,7 +17,7 @@ public class Member extends JpaBaseEntity {
     private String username;
     private int age;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Member가 연관관계 주인
+    @ManyToOne(fetch = FetchType.LAZY) // Member가 연관관계 주인!
     @JoinColumn(name = "team_id")
     private Team team;
     // protected Member() {} // 아무데서나 호출 못하도록
